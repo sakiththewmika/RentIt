@@ -20,7 +20,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Backend Build & Test
+      # Setup Java for Backend
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -29,16 +29,18 @@ jobs:
 
       - name: Build Backend with Maven
         working-directory: RentIT-backend
-        run: ./mvnw clean install -DskipTests=false
+        run: |
+          chmod +x mvnw
+          ./mvnw clean install -DskipTests=false
 
-      # Frontend Build
-      - name: Set up Node
+      # Setup Node for Frontend
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install & Build Frontend
-        working-directory: RentIT-frontend
+        working-directory: RentIt-frontend
         run: |
           npm install
           npm run build
@@ -54,12 +56,12 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build & Push Backend Image
+      - name: Build & Push Backend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-backend:latest ./rentit-backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-backend:latest ./RentIT-backend
           docker push ${{ secrets.DOCKER_USERNAME }}/rentit-backend:latest
 
-      - name: Build & Push Frontend Image
+      - name: Build & Push Frontend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-frontend:latest ./rentit-frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-frontend:latest ./RentIt-frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/rentit-frontend:latest
