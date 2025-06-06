@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  rentit-backend:
+    build:
+      context: ./rentit-backend
+    image: rentit-backend:latest
+    container_name: rentit-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/rentitdb
+    depends_on:
+      - mongo
+
+  rentit-frontend:
+    build:
+      context: ./rentit-frontend
+    image: rentit-frontend:latest
+    container_name: rentit-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - rentit-backend
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    command: mongod --bind_ip 0.0.0.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
+    driver: local

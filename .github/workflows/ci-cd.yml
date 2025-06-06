@@ -1,0 +1,65 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Backend Build & Test
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build Backend with Maven
+        working-directory: rentit-backend
+        run: ./mvnw clean install -DskipTests=false
+
+      # Frontend Build
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install & Build Frontend
+        working-directory: rentit-frontend
+        run: |
+          npm install
+          npm run build
+
+  docker-build-push:
+    runs-on: ubuntu-latest
+    needs: build-test
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build & Push Backend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-backend:latest ./rentit-backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/rentit-backend:latest
+
+      - name: Build & Push Frontend Image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/rentit-frontend:latest ./rentit-frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/rentit-frontend:latest
