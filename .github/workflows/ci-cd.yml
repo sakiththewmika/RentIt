@@ -28,7 +28,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build Backend with Maven
-        working-directory: rentit-backend
+        working-directory: RentIT-backend
         run: ./mvnw clean install -DskipTests=false
 
       # Frontend Build
@@ -38,7 +38,7 @@ jobs:
           node-version: '18'
 
       - name: Install & Build Frontend
-        working-directory: rentit-frontend
+        working-directory: RentIT-frontend
         run: |
           npm install
           npm run build
