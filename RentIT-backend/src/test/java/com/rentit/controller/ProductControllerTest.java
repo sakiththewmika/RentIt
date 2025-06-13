@@ -51,7 +51,7 @@ public class ProductControllerTest {
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is("Laptop")))
+                .andExpect(jsonPath("$[0].name", is("Desktop")))
                 .andExpect(jsonPath("$[1].name", is("Camera")));
     }
 
