@@ -36,7 +36,7 @@ public class ProductControllerTest {
     public void testGetAllProducts() throws Exception {
         Product product1 = new Product();
         product1.setId("1");
-        product1.setName("Laptop");
+        product1.setName("Desktop");
         product1.setPrice(999.99);
         product1.setCategory("Electronics");
 
